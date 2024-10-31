@@ -99,87 +99,159 @@
         <h1>Código JavaScript da Calculadora</h1>
         <p>Abaixo está o código JavaScript utilizado para resolver sistemas lineares:</p>
         <pre>
-            // Função para criar os inputs da matriz
-            function createMatrixInputs() {
-                const size = document.getElementById('size').value;
-                const matrixInputs = document.getElementById('matrixInputs');
-                matrixInputs.innerHTML = '';
-        
-                for (let i = 1; i <= size; i++) {
-                    const row = document.createElement('div');
-                    row.className = 'matrix-input';
-                    for (let j = 1; j <= size; j++) {
-                        row.innerHTML += `<input type="number" placeholder="A[${i}][${j}]">`;
-                    }
-                    matrixInputs.appendChild(row);
-                }
+           // Função para criar os campos de entrada da matriz A
+function createMatrixInputs() {
+    const size = document.getElementById('size').value;  // Obtém o valor da dimensão da matriz
+    const matrixInputs = document.getElementById('matrixInputs');  // Seleciona o elemento onde a matriz será exibida
+    matrixInputs.innerHTML = '';  // Limpa qualquer entrada existente
+
+    // Cria os inputs para a matriz A com a dimensão especificada
+    for (let i = 1; i <= size; i++) {
+        const row = document.createElement('div');  // Cria um contêiner para uma linha da matriz
+        row.className = 'matrix-input';  // Adiciona uma classe para estilo
+        for (let j = 1; j <= size; j++) {
+            row.innerHTML += `<input type="number" placeholder="A[${i}][${j}]">`;  // Adiciona um input para cada elemento
+        }
+        matrixInputs.appendChild(row);  // Adiciona a linha de inputs ao contêiner da matriz
+    }
+}
+
+// Função para criar os campos de entrada do vetor B
+function createVectorBInputs() {
+    const size = document.getElementById('size').value;  // Obtém o tamanho do vetor B
+    const vectorBInputs = document.getElementById('vectorBInputs');  // Seleciona o elemento onde o vetor B será exibido
+    vectorBInputs.innerHTML = '';  // Limpa qualquer entrada existente
+
+    // Cria os inputs para cada elemento do vetor B
+    for (let i = 1; i <= size; i++) {
+        vectorBInputs.innerHTML += `<input type="number" placeholder="b[${i}]">`;  // Adiciona um input para cada elemento de B
+    }
+}
+
+// Função para decomposição LU da matriz A
+function luDecomposition(A) {
+    const n = A.length;  // Tamanho da matriz
+    const L = Array.from({ length: n }, () => Array(n).fill(0));  // Inicializa a matriz L com zeros
+    const U = Array.from({ length: n }, () => Array(n).fill(0));  // Inicializa a matriz U com zeros
+
+    // Realiza a decomposição LU
+    for (let i = 0; i < n; i++) {
+        for (let j = i; j < n; j++) {
+            U[i][j] = A[i][j];
+            for (let k = 0; k < i; k++) {
+                U[i][j] -= L[i][k] * U[k][j];  // Calcula os elementos de U
             }
-        
-            // Função para criar os inputs do vetor b
-            function createVectorBInputs() {
-                const size = document.getElementById('size').value;
-                const vectorBInputs = document.getElementById('vectorBInputs');
-                vectorBInputs.innerHTML = '';
-        
-                for (let i = 1; i <= size; i++) {
-                    vectorBInputs.innerHTML += `<input type="number" placeholder="b[${i}]">`;
+        }
+
+        for (let j = i; j < n; j++) {
+            if (i === j) {
+                L[i][i] = 1;  // Define o elemento da diagonal principal de L como 1
+            } else {
+                L[j][i] = A[j][i];
+                for (let k = 0; k < i; k++) {
+                    L[j][i] -= L[j][k] * U[k][i];  // Calcula os elementos de L
                 }
+                L[j][i] /= U[i][i];  // Finaliza o cálculo dos elementos de L
             }
-        
-            // Funções de decomposição e cálculo
-            function luDecomposition(A) { /* código */ }
-            function forwardSubstitution(L, b) { /* código */ }
-            function backwardSubstitution(U, y) { /* código */ }
-            function calculateDeterminant(U) { /* código */ }
-        
-            function calculate() {
-                const size = parseInt(document.getElementById('size').value);
-                const A = [];
-                const b = [];
-        
-                const matrixInputs = document.querySelectorAll('#matrixInputs input');
-                const vectorBInputs = document.querySelectorAll('#vectorBInputs input');
-        
-                for (let i = 1; i <= size; i++) {
-                    const row = [];
-                    for (let j = 1; j <= size; j++) {
-                        row.push(parseFloat(matrixInputs[(i - 1) * size + (j - 1)].value));
-                    }
-                    A.push(row);
-                }
-        
-                for (let i = 1; i <= size; i++) {
-                    b.push(parseFloat(vectorBInputs[i - 1].value));
-                }
-        
-                const { L, U } = luDecomposition(A);
-                const y = forwardSubstitution(L, b);
-                const x = backwardSubstitution(U, y);
-                const detA = calculateDeterminant(U);
-        
-                const resultDiv = document.getElementById('result');
-                resultDiv.innerHTML = `
-                    <h3>Resultados:</h3>
-                    <p><strong>(a)</strong> Matriz L:</p>
-                    <pre>${JSON.stringify(L.map(row => row.map(value => value.toFixed(4))), null, 2)}</pre>
-                    <p><strong>(b)</strong> Matriz U:</p>
-                    <pre>${JSON.stringify(U.map(row => row.map(value => value.toFixed(4))), null, 2)}</pre>
-                    <p><strong>(c)</strong> Determinante de A:</p>
-                    <pre>${detA.toFixed(4)}</pre>
-                    <p><strong>(d)</strong> Vetor y:</p>
-                    <pre>${y.map(value => value.toFixed(4))}</pre>
-                    <p><strong>(e)</strong> Vetor solução x:</p>
-                    <pre>${x.map(value => value.toFixed(4))}</pre>
-                `;
-            }
-        
-            document.getElementById('size').addEventListener('input', () => {
-                createMatrixInputs();
-                createVectorBInputs();
-            });
-        
-            createMatrixInputs();
-            createVectorBInputs();
+        }
+    }
+
+    return { L, U };  // Retorna as matrizes L e U
+}
+
+// Função para substituição direta com a matriz L
+function forwardSubstitution(L, b) {
+    const n = L.length;  // Tamanho do vetor y
+    const y = Array(n).fill(0);  // Inicializa o vetor y com zeros
+
+    // Calcula cada elemento de y
+    for (let i = 0; i < n; i++) {
+        y[i] = b[i];
+        for (let j = 0; j < i; j++) {
+            y[i] -= L[i][j] * y[j];  // Ajusta y considerando os elementos de L
+        }
+    }
+
+    return y;  // Retorna o vetor y
+}
+
+// Função para substituição retroativa com a matriz U
+function backwardSubstitution(U, y) {
+    const n = U.length;  // Tamanho do vetor x
+    const x = Array(n).fill(0);  // Inicializa o vetor x com zeros
+
+    // Calcula cada elemento de x
+    for (let i = n - 1; i >= 0; i--) {
+        x[i] = y[i];
+        for (let j = i + 1; j < n; j++) {
+            x[i] -= U[i][j] * x[j];  // Ajusta x considerando os elementos de U
+        }
+        x[i] /= U[i][i];  // Divide pelo elemento da diagonal de U
+    }
+
+    return x;  // Retorna o vetor x
+}
+
+// Função para calcular o determinante da matriz U
+function calculateDeterminant(U) {
+    let det = 1;  // Inicializa o determinante
+    for (let i = 0; i < U.length; i++) {
+        det *= U[i][i];  // Multiplica pelos elementos da diagonal principal
+    }
+    return det;  // Retorna o determinante
+}
+
+// Função principal para realizar todos os cálculos
+function calculate() {
+    const size = parseInt(document.getElementById('size').value);  // Obtém o tamanho da matriz
+    const A = [];  // Declara a matriz A
+    const b = [];  // Declara o vetor b
+
+    const matrixInputs = document.querySelectorAll('#matrixInputs input');  // Seleciona os inputs da matriz A
+    const vectorBInputs = document.querySelectorAll('#vectorBInputs input');  // Seleciona os inputs do vetor B
+
+    // Monta a matriz A a partir dos valores de entrada
+    for (let i = 1; i <= size; i++) {
+        const row = [];
+        for (let j = 1; j <= size; j++) {
+            row.push(parseFloat(matrixInputs[(i - 1) * size + (j - 1)].value));  // Armazena cada valor em A
+        }
+        A.push(row);
+    }
+
+    // Monta o vetor B a partir dos valores de entrada
+    for (let i = 1; i <= size; i++) {
+        b.push(parseFloat(vectorBInputs[i - 1].value));  // Armazena cada valor em B
+    }
+
+    const { L, U } = luDecomposition(A);  // Calcula as matrizes L e U com a decomposição LU
+    const y = forwardSubstitution(L, b);  // Realiza a substituição direta
+    const x = backwardSubstitution(U, y);  // Realiza a substituição retroativa
+    const detA = calculateDeterminant(U);  // Calcula o determinante de A
+
+    // Exibe os resultados no elemento de resultado
+    const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = `
+        <h3>Resultados:</h3>
+        <p><strong>(a)</strong> Matriz L:</p>
+        <pre>${JSON.stringify(L.map(row => row.map(value => value.toFixed(4))), null, 2)}</pre>
+        <p><strong>(a)</strong> Matriz U:</p>
+        <pre>${JSON.stringify(U.map(row => row.map(value => value.toFixed(4))), null, 2)}</pre>
+        <p><strong>(b)</strong> Det(A): ${detA.toFixed(4)}</p>
+        <p><strong>(c)</strong> Solução do sistema: [${x.map(value => value.toFixed(4)).join(', ')}]</p>
+    `;
+}
+
+// Evento para atualizar as entradas de matriz e vetor sempre que o tamanho é alterado
+document.getElementById('size').addEventListener('input', function() {
+    createMatrixInputs();
+    createVectorBInputs();
+});
+
+// Inicializa a matriz e o vetor B ao carregar a página
+createMatrixInputs();
+createVectorBInputs();
+
         </pre>
         <p>Abaixo está o código Ptyhon utilizado para resolver sistemas lineares:</p>            
         <pre>
