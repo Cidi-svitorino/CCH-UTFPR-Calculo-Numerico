@@ -181,6 +181,78 @@
             createMatrixInputs();
             createVectorBInputs();
         </pre>
+        <p>Abaixo está o código Ptyhon utilizado para resolver sistemas lineares:</p>            
+        <pre>
+           import numpy as np
+
+# Função para decomposição LU de uma matriz A
+def lu_decomposition(A):
+    n = A.shape[0]  # Dimensão da matriz A
+    L = np.zeros((n, n))  # Inicializa matriz L como uma matriz de zeros
+    U = np.zeros((n, n))  # Inicializa matriz U como uma matriz de zeros
+    
+    # Preenche as matrizes L e U
+    for i in range(n):
+        # Calcula a linha i da matriz U
+        for j in range(i, n):
+            U[i, j] = A[i, j] - sum(L[i, k] * U[k, j] for k in range(i))
+        
+        # Calcula a coluna i da matriz L
+        for j in range(i, n):
+            if i == j:
+                L[i, i] = 1  # Define 1 na diagonal principal de L
+            else:
+                L[j, i] = (A[j, i] - sum(L[j, k] * U[k, i] for k in range(i))) / U[i, i]
+    
+    return L, U  # Retorna as matrizes L e U
+
+# Função para substituição direta (Forward Substitution) para resolver Ly = b
+def forward_substitution(L, b):
+    n = L.shape[0]  # Dimensão da matriz L
+    y = np.zeros(n)  # Inicializa vetor y com zeros
+    
+    # Resolve Ly = b para y
+    for i in range(n):
+        y[i] = b[i] - sum(L[i, j] * y[j] for j in range(i))
+    
+    return y  # Retorna o vetor y
+
+# Função para substituição inversa (Backward Substitution) para resolver Ux = y
+def backward_substitution(U, y):
+    n = U.shape[0]  # Dimensão da matriz U
+    x = np.zeros(n)  # Inicializa vetor x com zeros
+    
+    # Resolve Ux = y para x
+    for i in range(n-1, -1, -1):
+        x[i] = (y[i] - sum(U[i, j] * x[j] for j in range(i+1, n))) / U[i, i]
+    
+    return x  # Retorna o vetor x, solução do sistema
+
+# Define a matriz A e o vetor b como exemplo de entrada
+A = np.array([[4, -2, 1],
+              [-3, -1, 4],
+              [1, -1, 3]], dtype=float)
+b = np.array([15, 8, 13], dtype=float)
+
+# Realiza a decomposição LU
+L, U = lu_decomposition(A)
+
+# Resolve Ly = b usando substituição direta
+y = forward_substitution(L, b)
+
+# Resolve Ux = y usando substituição inversa para encontrar a solução x
+x = backward_substitution(U, y)
+
+# Calcula o determinante de A como o produto dos elementos da diagonal de U
+det_A = np.prod(np.diag(U))
+
+# Exibe os resultados
+print("Matriz L:\n", L)          # Imprime a matriz L
+print("Matriz U:\n", U)          # Imprime a matriz U
+print("Det(A):", det_A)          # Imprime o determinante de A
+print("Solução do sistema:", x)  # Imprime a solução do sistema Ax = b
+
+        </pre>
     </main>
 </body>
 </html>
