@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Código JS - Calculadora de Sistema Linear</title>
+    <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #2e2e2e;
+            line-height: 1.6;
+        }
+
+        /* Cabeçalho e Navegação */
+        header {
+            background-color: #0000006e;
+            padding: 15px 0;
+            text-align: center;
+        }
+
+        .logo {
+            color: #71a4df;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        nav a:hover {
+            background-color: #71a4df;
+        }
+
+        /* Conteúdo principal */
+        main {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Estilo da área de código */
+        pre {
+            background-color: #f9f9f9;
+            border: 1px solid #e1e1e1;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .logo {
+            height: 80px;
+            margin-right: 15px; 
+            vertical-align: middle;
+}
+    </style>
+</head>
+<body>
+    <header>
+        <img src="logo.png" alt="Logo do site" class="logo">
+        <nav>
+            <a href="index.html">Início</a>
+            <a href="about.html">Sobre</a>
+            <a href="calculo.html">Cálculo</a>
+            <a href="cod.html">Código JS</a>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Código JavaScript da Calculadora</h1>
+        <p>Abaixo está o código JavaScript utilizado para resolver sistemas lineares:</p>
+        <pre>
+            // Função para criar os inputs da matriz
+            function createMatrixInputs() {
+                const size = document.getElementById('size').value;
+                const matrixInputs = document.getElementById('matrixInputs');
+                matrixInputs.innerHTML = '';
+        
+                for (let i = 1; i <= size; i++) {
+                    const row = document.createElement('div');
+                    row.className = 'matrix-input';
+                    for (let j = 1; j <= size; j++) {
+                        row.innerHTML += `<input type="number" placeholder="A[${i}][${j}]">`;
+                    }
+                    matrixInputs.appendChild(row);
+                }
+            }
+        
+            // Função para criar os inputs do vetor b
+            function createVectorBInputs() {
+                const size = document.getElementById('size').value;
+                const vectorBInputs = document.getElementById('vectorBInputs');
+                vectorBInputs.innerHTML = '';
+        
+                for (let i = 1; i <= size; i++) {
+                    vectorBInputs.innerHTML += `<input type="number" placeholder="b[${i}]">`;
+                }
+            }
+        
+            // Funções de decomposição e cálculo
+            function luDecomposition(A) { /* código */ }
+            function forwardSubstitution(L, b) { /* código */ }
+            function backwardSubstitution(U, y) { /* código */ }
+            function calculateDeterminant(U) { /* código */ }
+        
+            function calculate() {
+                const size = parseInt(document.getElementById('size').value);
+                const A = [];
+                const b = [];
+        
+                const matrixInputs = document.querySelectorAll('#matrixInputs input');
+                const vectorBInputs = document.querySelectorAll('#vectorBInputs input');
+        
+                for (let i = 1; i <= size; i++) {
+                    const row = [];
+                    for (let j = 1; j <= size; j++) {
+                        row.push(parseFloat(matrixInputs[(i - 1) * size + (j - 1)].value));
+                    }
+                    A.push(row);
+                }
+        
+                for (let i = 1; i <= size; i++) {
+                    b.push(parseFloat(vectorBInputs[i - 1].value));
+                }
+        
+                const { L, U } = luDecomposition(A);
+                const y = forwardSubstitution(L, b);
+                const x = backwardSubstitution(U, y);
+                const detA = calculateDeterminant(U);
+        
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = `
+                    <h3>Resultados:</h3>
+                    <p><strong>(a)</strong> Matriz L:</p>
+                    <pre>${JSON.stringify(L.map(row => row.map(value => value.toFixed(4))), null, 2)}</pre>
+                    <p><strong>(b)</strong> Matriz U:</p>
+                    <pre>${JSON.stringify(U.map(row => row.map(value => value.toFixed(4))), null, 2)}</pre>
+                    <p><strong>(c)</strong> Determinante de A:</p>
+                    <pre>${detA.toFixed(4)}</pre>
+                    <p><strong>(d)</strong> Vetor y:</p>
+                    <pre>${y.map(value => value.toFixed(4))}</pre>
+                    <p><strong>(e)</strong> Vetor solução x:</p>
+                    <pre>${x.map(value => value.toFixed(4))}</pre>
+                `;
+            }
+        
+            document.getElementById('size').addEventListener('input', () => {
+                createMatrixInputs();
+                createVectorBInputs();
+            });
+        
+            createMatrixInputs();
+            createVectorBInputs();
+        </pre>
+    </main>
+</body>
+</html>
